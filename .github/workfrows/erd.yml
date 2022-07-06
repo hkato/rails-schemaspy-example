@@ -1,0 +1,58 @@
+name: Entity Relationship Diagram
+
+on: push
+
+jobs:
+  # Label of the container job
+  container-job:
+    # Containers must run in Linux based operating systems
+    runs-on: ubuntu-latest
+    # Docker Hub image that `container-job` executes in
+    container: ruby:2.7.6
+  env:
+    POSTGRES_USER: username
+    POSTGRES_PASSWORD: p@ssw0rd
+    POSTGRES_DB: erd
+
+  # Service containers to run with `container-job`
+  services:
+    # Label used to access the service container
+    postgres:
+      # Docker Hub image
+      image: postgres:13.7
+      # Provide the password for postgres
+      env:
+        POSTGRES_USER: $POSTGRES_USER
+        POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+        POSTGRES_DB: $POSTGRES_DB
+      # Set health checks to wait until postgres has started
+      options: >-
+        --health-cmd pg_isready
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Ruby Setup
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.6
+          bundler-cache: true
+          cache-version: 1
+      - name: Setup database
+        uses: |
+          cat <<EOF > config/database.yml
+          development:
+            adapter: postgresql
+            pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+            timeout: 5000
+            username: $POSTGRES_USER
+            password: $POSTGRES_PASSWORD
+            database: $POSTGRES_DB
+            host: postgres
+            encoding: unicode
+          EOF
+          bundle exec rails db:create
+          bundle exec rails db:migrate
