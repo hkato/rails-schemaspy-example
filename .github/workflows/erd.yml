@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: ["main"]
 jobs:
-  test:
+  erd:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -37,7 +37,7 @@ jobs:
           schemaspy.t=pgsql
           schemaspy.host=localhost
           schemaspy.port=5432
-          schemaspy.db=rails
+          schemaspy.db=rails_test
           schemaspy.u=rails
           schemaspy.p=password
           schemaspy.s=public
