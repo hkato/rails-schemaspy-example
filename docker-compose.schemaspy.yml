@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  schemaspy:
+    build: ./schemaspy/
+    volumes:
+      - ./schemaspy/output:/output
+      - ./schemaspy/schemaspy.properties:/schemaspy.properties
+    depends_on:
+      - postgres
