@@ -30,12 +30,14 @@ jobs:
           bundler-cache: true
       # Add or replace database setup steps here
       - name: Set up database schema
-        run: bin/rails db:schema:load
+        run: |
+          bin/rails db:create
+          bin/rails db:migrate
       - name: Create SchemaSpy properties
         run: |
           cat <<EOF > /tmp/schemaspy.properties
           schemaspy.t=pgsql
-          schemaspy.host=localhost
+          schemaspy.host=0.0.0.0
           schemaspy.port=5432
           schemaspy.db=rails_test
           schemaspy.u=rails
