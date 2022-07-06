@@ -1,10 +1,11 @@
 name: Entity Relationship Diagram
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+  push
+  # push:
+  #   branches: ["main"]
+  # pull_request:
+  #   branches: ["main"]
 jobs:
   erd:
     runs-on: ubuntu-latest
