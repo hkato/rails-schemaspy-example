@@ -31,7 +31,7 @@ jobs:
       # Add or replace database setup steps here
       - name: Set up database schema
         run: bin/rails db:schema:load
-      - name: Create SchemaSpy properties
+      - name: Create SchemaSpy document
         run: |
           cat <<EOF > /tmp/schemaspy.properties
           schemaspy.t=pgsql
@@ -47,7 +47,7 @@ jobs:
             -v "/tmp/output:/output" \
             -v "/tmp/schemaspy.properties:/schemaspy.properties" \
             schemaspy/schemaspy:latest -rails
-      - name: ERD Artifact
+      - name: Upload SchemaSpy artifact
         uses: actions/upload-artifact@v2
         with:
           name: schemaspy
