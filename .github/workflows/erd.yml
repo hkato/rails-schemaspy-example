@@ -1,58 +1,33 @@
 name: Entity Relationship Diagram
 
-on: push
-
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 jobs:
-  # Label of the container job
-  container-job:
-    # Containers must run in Linux based operating systems
+  test:
     runs-on: ubuntu-latest
-    # Docker Hub image that `container-job` executes in
-    container: ruby:2.7.6
-  env:
-    POSTGRES_USER: username
-    POSTGRES_PASSWORD: p@ssw0rd
-    POSTGRES_DB: erd
-
-  # Service containers to run with `container-job`
-  services:
-    # Label used to access the service container
-    postgres:
-      # Docker Hub image
-      image: postgres:13.7
-      # Provide the password for postgres
-      env:
-        POSTGRES_USER: $POSTGRES_USER
-        POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-        POSTGRES_DB: $POSTGRES_DB
-      # Set health checks to wait until postgres has started
-      options: >-
-        --health-cmd pg_isready
-        --health-interval 10s
-        --health-timeout 5s
-        --health-retries 5
-
+    services:
+      postgres:
+        image: postgres:13.7-alpine
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_DB: rails_test
+          POSTGRES_USER: rails
+          POSTGRES_PASSWORD: password
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
     steps:
-      - name: Check out repository code
+      - name: Checkout code
         uses: actions/checkout@v3
-      - name: Ruby Setup
-        uses: ruby/setup-ruby@v1
+      # Add or replace dependency steps here
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@8f312efe1262fb463d906e9bf040319394c18d3e # v1.92
         with:
-          ruby-version: 2.7.6
           bundler-cache: true
-          cache-version: 1
-      - name: Setup database
-        uses: |
-          cat <<EOF > config/database.yml
-          development:
-            adapter: postgresql
-            pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-            timeout: 5000
-            username: $POSTGRES_USER
-            password: $POSTGRES_PASSWORD
-            database: $POSTGRES_DB
-            host: postgres
-            encoding: unicode
-          EOF
-          bundle exec rails db:create
-          bundle exec rails db:migrate
+      # Add or replace database setup steps here
+      - name: Set up database schema
+        run: bin/rails db:schema:load
