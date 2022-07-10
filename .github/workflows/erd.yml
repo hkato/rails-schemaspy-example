@@ -43,9 +43,9 @@ jobs:
           schemaspy.p=password
           schemaspy.s=public
           EOF
-          mkdir -p -m 777 /tmp/artifacts/public/schemaspy
+          mkdir -p -m 777 /tmp/artifacts/docs/schemaspy
           docker run --net=${{ job.container.network }} \
-            -v "/tmp/artifacts/public/schemaspy:/output" \
+            -v "/tmp/artifacts/docs/schemaspy:/output" \
             -v "/tmp/schemaspy.properties:/schemaspy.properties" \
             schemaspy/schemaspy:latest -rails
       - name: Create tbls document
@@ -55,7 +55,7 @@ jobs:
           name: mydatabase
           desc: This is My Database
           dsn: postgres://rails:password@localhost:5432/rails_test?sslmode=disable
-          docPath: docs/tbls
+          docPath: tbls
           EOF
           mkdir -p /tmp/artifacts/docs/tbls
           cd /tmp/artifacts
@@ -70,8 +70,8 @@ jobs:
         run: |          
           cat <<EOF > /tmp/artifacts/mkdocs.yml
           site_name: Database document
-          docs_dir: 'docs/tbls'
-          site_dir: 'public/tbls'
+          docs_dir: 'tbls'
+          site_dir: 'docs/tbls'
           theme:
             name: material
           EOF
