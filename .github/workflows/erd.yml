@@ -43,19 +43,34 @@ jobs:
           schemaspy.p=password
           schemaspy.s=public
           EOF
-          mkdir -m 777 /tmp/output
+          mkdir -p -m 777 /tmp/public/schemaspy
           docker run --net=${{ job.container.network }} \
-            -v "/tmp/output:/output" \
+            -v "/tmp/public/schemaspy:/output" \
             -v "/tmp/schemaspy.properties:/schemaspy.properties" \
             schemaspy/schemaspy:latest -rails
-      - name: Upload SchemaSpy artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: schemaspy
-          path: /tmp/output
+      - name: Create tbls document
+        run: |
+          source <(curl https://raw.githubusercontent.com/k1LoW/tbls/main/use)
+          cat <<EOF > /tmp/.tbls.yml
+          name: mydatabase
+          desc: This is My Database
+          dsn: postgres://rails:password@localhost:5432/rails_test?sslmode=disable
+          docPath: /tmp/docs/tbls
+          EOF
+          mkdir -p /tmp/docs/tbls
+          cd /tmp
+          tbls doc --force
+          cat <<EOF > /tmp/mkdocs.yml
+          site_name: Database document
+          docs_dir: 'docs/tbls'
+          site_dir: 'public/tbls'
+          theme:
+            name: material
+          EOF
+          mkdocs build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /tmp/output
+          publish_dir: /tmp
