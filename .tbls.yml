@@ -1,0 +1,4 @@
+name: mydatabase
+desc: This is My Database
+dsn: postgres://rails:password@localhost:5432/rails_test?sslmode=disable
+docPath: docs/tbls

@@ -1,0 +1,5 @@
+site_name: Database document
+docs_dir: 'docs/tbls'
+site_dir: 'public/tbls'
+theme:
+  name: material
