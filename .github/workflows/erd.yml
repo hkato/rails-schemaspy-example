@@ -43,22 +43,22 @@ jobs:
           schemaspy.p=password
           schemaspy.s=public
           EOF
-          mkdir -p -m 777 /tmp/public/schemaspy
+          mkdir -p -m 777 /tmp/artifacts/public/schemaspy
           docker run --net=${{ job.container.network }} \
-            -v "/tmp/public/schemaspy:/output" \
+            -v "/tmp/artifacts/public/schemaspy:/output" \
             -v "/tmp/schemaspy.properties:/schemaspy.properties" \
             schemaspy/schemaspy:latest -rails
       - name: Create tbls document
         run: |
           source <(curl https://raw.githubusercontent.com/k1LoW/tbls/main/use)
-          cat <<EOF > /tmp/.tbls.yml
+          cat <<EOF > /tmp/artifacts/.tbls.yml
           name: mydatabase
           desc: This is My Database
           dsn: postgres://rails:password@localhost:5432/rails_test?sslmode=disable
-          docPath: /tmp/docs/tbls
+          docPath: docs/tbls
           EOF
-          mkdir -p /tmp/docs/tbls
-          cd /tmp
+          mkdir -p /tmp/artifacts/docs/tbls
+          cd /tmp/artifacts
           tbls doc --force
       - name: Setup Python
         uses: actions/setup-python@v2
@@ -68,17 +68,18 @@ jobs:
         run: pip install mkdocs-material
       - name: Create MkDocs document
         run: |          
-          cat <<EOF > /tmp/mkdocs.yml
+          cat <<EOF > /tmp/artifacts/mkdocs.yml
           site_name: Database document
           docs_dir: 'docs/tbls'
           site_dir: 'public/tbls'
           theme:
             name: material
           EOF
+          cd /tmp/artifacts
           mkdocs build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /tmp
+          publish_dir: /tmp/artifacts
