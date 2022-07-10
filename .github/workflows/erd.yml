@@ -60,6 +60,14 @@ jobs:
           mkdir -p /tmp/docs/tbls
           cd /tmp
           tbls doc --force
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install MkDocs Material
+        run: pip install mkdocs-material
+      - name: Create MkDocs document
+        run: |          
           cat <<EOF > /tmp/mkdocs.yml
           site_name: Database document
           docs_dir: 'docs/tbls'
