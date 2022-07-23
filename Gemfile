@@ -31,6 +31,9 @@ gem 'jbuilder', '~> 2.7'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'psych', '~> 3.2'
+gem "net-smtp", '~> 0.3'
+gem 'net-pop', '~> 0.1'
+gem 'net-imap', '~> 0.2'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
