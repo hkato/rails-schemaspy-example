@@ -1,24 +1,4 @@
-# README
+# Ruby on Rails ERD CI example
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- [SchemaSpy](https://hkato.github.io/rails-schemaspy-example/schemaspy/)
+- [tbls + Material for MkDocs](https://hkato.github.io/rails-schemaspy-example/tbls/)
