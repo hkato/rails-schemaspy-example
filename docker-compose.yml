@@ -1,0 +1,13 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - 3000:3000
+    environment:
+      RAILS_ENV: production
+      RAILS_SERVE_STATIC_FILES: true
+      RAILS_LOG_TO_STDOUT: true
+      DATABASE_URL: postgres://username:password@postgres:5432/rails
+      # DATABASE_URL: mysql2://username:password@mysql:3306/rails?encoding=utf8mb4
