@@ -15,7 +15,7 @@ development:
   username: username
   password: password
   database: rails
-  host: localhost
+  host: postgres
   encoding: unicode
 
 # Warning: The database defined as "test" will be erased and
