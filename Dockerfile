@@ -19,8 +19,8 @@ COPY . /src
 RUN bundle install
 
 # Node.js packages & webpack
-RUN yarn install
-RUN bin/rails webpacker:compile && \
+RUN yarn install && \
+    bin/rails webpacker:compile && \
     bin/rails assets:precompile
 
 # Create runtime distribution
@@ -34,14 +34,14 @@ RUN mkdir -p /dist && \
 FROM ruby:3.0.4-slim
 
 RUN apt-get update && apt-get install -y \
-    libpq-dev \
+    libsqlite3-dev \
     default-libmysqlclient-dev \
-    sqlite3 # postgresql-client default-mysql-client
+    libpq-dev # sqlite3 postgresql-client default-mysql-client
 
 WORKDIR /app
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 COPY --from=builder /dist /app
-RUN mkdir /app/storage && mkdir /app/tmp && mkdir /app/log
+RUN mkdir log storage tmp
 
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
