@@ -4,7 +4,7 @@
 #     + Node.js for webpack
 #
 FROM node:16.16.0-slim as node
-FROM ruby:3.1.2 as builder
+FROM ruby:3.0.4 as builder
 
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /opt/yarn-* /opt/yarn
@@ -31,7 +31,7 @@ RUN mkdir -p /dist && \
 #
 # Runtime image
 #
-FROM ruby:3.1.2-slim
+FROM ruby:3.0.4-slim
 
 RUN apt-get update && apt-get install -y \
     libpq-dev \
