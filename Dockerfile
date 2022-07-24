@@ -1,7 +1,7 @@
 #
 # Builder image
 #   = Ruby + build-essential(gcc/g++) for native extensions
-#     + Node.js for webpack
+#   + Node.js for webpack
 #
 FROM node:16.16.0-slim as node
 FROM ruby:3.0.4 as builder
@@ -10,18 +10,18 @@ COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /opt/yarn-* /opt/yarn
 RUN ln -fs /opt/yarn/bin/yarn /usr/local/bin/yarn
 
-WORKDIR /app
+WORKDIR /src
 
 # Copy source code
-COPY . /app
+COPY . /src
 
 # Ruby gem packages
 RUN bundle install
 
 # Node.js packages & webpack
 RUN yarn install
-RUN /app/bin/rails webpacker:compile && \
-    /app/bin/rails assets:precompile
+RUN bin/rails webpacker:compile && \
+    bin/rails assets:precompile
 
 # Create runtime distribution
 RUN mkdir -p /dist && \
