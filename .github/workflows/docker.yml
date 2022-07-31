@@ -23,5 +23,6 @@ jobs:
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
       - name: Build
-        run: |
-          docker build .
+        uses: docker/build-push-action@v3
+        with:
+          push: false
