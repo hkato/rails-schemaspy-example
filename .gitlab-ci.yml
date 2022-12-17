@@ -1,0 +1,45 @@
+variables:
+  DOCKER_HOST: tcp://docker:2375
+
+erd:
+  stage: build
+  image: ruby:3.0.4
+  services:
+    - postgres:13.9-alpine
+  variables:
+    POSTGRES_USER: username
+    POSTGRES_PASSWORD: password
+    POSTGRES_DB: example
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_HOST_AUTH_METHOD: trust
+    DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+    SCHEMASPY_VERSION: 6.1.0
+    POSTGRESQL_JDBC_VERSION: 42.5.1
+  script:
+    - apt-get update -qq && apt-get install -y postgresql-client-13 openjdk-11-jre-headless
+    - curl -o schemaspy.jar -L https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar
+    - curl -OL https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
+    - bin/bundle install
+    - bin/rails db:create db:schema:load
+    - echo $DATABASE_URL
+    - mkdir -p docs/schemaspy
+    - java -jar schemaspy.jar -dp .
+      -t pgsql -db ${POSTGRES_DB} -host ${POSTGRES_HOST} -port ${POSTGRES_PORT} -u ${POSTGRES_USER} -p ${POSTGRES_PASSWORD}
+      -o docs/schemaspy
+      -vizjs -rails
+  artifacts:
+    paths:
+      - docs/schemaspy
+
+pages:
+  stage: build
+  image: asciidoctor/docker-asciidoctor
+  script:
+    - asciidoctor -D public 'docs/**/*.adoc'
+    - cp -r docs/schemaspy public/
+  needs:
+    - erd
+  artifacts:
+    paths:
+      - public
