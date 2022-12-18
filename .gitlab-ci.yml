@@ -7,27 +7,34 @@ erd:
   services:
     - postgres:13.9-alpine
   variables:
+    # PostgreSQL service environments
     POSTGRES_USER: username
     POSTGRES_PASSWORD: password
     POSTGRES_DB: example
     POSTGRES_HOST: postgres
     POSTGRES_PORT: 5432
     POSTGRES_HOST_AUTH_METHOD: trust
-    DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+    # SchemaSpy + JDBC driver versions
     SCHEMASPY_VERSION: 6.1.0
     POSTGRESQL_JDBC_VERSION: 42.5.1
-  script:
+  before_script:
+    # データベースクライアントとSchemaSpyを動作させるためのJava環境を準備。
     - apt-get update -qq && apt-get install -y postgresql-client-13 openjdk-11-jre-headless
-    - curl -o schemaspy.jar -L https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar
-    - curl -OL https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
+    # ここはRailsとしての準備とデータベースへのスキーマ設定。他の言語・フレームワーク・マイグレーションツールを使うならその手法に置き換える。
+    - export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
     - bin/bundle install
     - bin/rails db:create db:schema:load
-    - echo $DATABASE_URL
+    # SchemaSpyとJDBCドライバーの準備。他のデータベース利用ならそちらを。
+    - curl -o schemaspy.jar -L https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar
+    - curl -OL https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
+  script:
     - mkdir -p docs/schemaspy
+    # 接続情報をオプションで指定した。schemaspy.propertiesにヒアドキュメントで書き出し読み込ませても良い。
     - java -jar schemaspy.jar -dp .
       -t pgsql -db ${POSTGRES_DB} -host ${POSTGRES_HOST} -port ${POSTGRES_PORT} -u ${POSTGRES_USER} -p ${POSTGRES_PASSWORD}
       -o docs/schemaspy
-      -vizjs -rails
+      -vizjs
+      -rails
   artifacts:
     paths:
       - docs/schemaspy
